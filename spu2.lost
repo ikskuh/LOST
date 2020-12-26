@@ -1,0 +1,12 @@
+# This is a procedure that gets inlined by guarantee
+# can be useful to write custom intrinsics.
+pub inlineproc bswap(value: register) -> register
+{
+  # TODO: Properly design how to pass input/output values
+  asm(
+    push(value),
+    \\bswap   
+    , pop(value)
+  );
+  return value;
+}

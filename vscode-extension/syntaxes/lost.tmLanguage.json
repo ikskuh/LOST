@@ -1,0 +1,157 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "lost",
+  "scopeName": "source.lost",
+  "fileTypes": [
+    "lost"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#numbers"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.declaration.lost",
+          "match": "\\b(var|const|layout|enum)\\b"
+        },
+        {
+          "name": "keyword.control.flow.lost",
+          "match": "\\b(break|return|continue)\\b"
+        },
+        {
+          "name": "storage.type.lost",
+          "match": "\\b(byte|register|pointer|integer|string)\\b"
+        },
+        {
+          "name": "keyword.control.conditional.lost",
+          "match": "\\b(if|else)\\b"
+        },
+        {
+          "name": "keyword.control.repeat.lost",
+          "match": "\\b(loop)\\b"
+        },
+        {
+          "name": "keyword.constant.bool.lost",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "keyword.constant.none.lost",
+          "match": "\\bvoid\\b"
+        },
+        {
+          "name": "keyword.default.lost",
+          "match": "\\b(import|as|proc|asmproc|inlineproc|macro|pub|cast|namespace|asm|and|or|not)\\b"
+        },
+        {
+          "name": "variable.other.enummember.zig",
+          "match": "@[_$[:alpha:]][_$[:alnum:]]*\\b"
+        },
+        {
+          "name": "entity.name.function.lost",
+          "match": "[_$[:alpha:]][_$[:alnum:]]*(?=\\s*(=|:)\\s*\\bfunction\\b)"
+        },
+        {
+          "name": "entity.name.function.call.lost",
+          "match": "[_$[:alpha:]][_$[:alnum:]]*(?=\\s*\\()"
+        },
+        {
+          "name": "variable.lost",
+          "match": "[_$[:alpha:]][_$[:alnum:]]*"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.comparison.lost",
+          "match": "(\\b(and|or|not)\\b)|(==|!=)"
+        },
+        {
+          "name": "keyword.operator.arithmetic.lost",
+          "match": "(-|\\+|\\*|/|%|\\||&|\\^)=?"
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.lost",
+          "begin": "#",
+          "end": "$",
+          "patterns": [
+            {
+              "match": "\\b(TODO|NOTE|FIXME|XXX)\\b",
+              "name": "keyword.todo.lost"
+            }
+          ]
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.lost",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "include": "#stringcontent"
+            }
+          ]
+        },
+        {
+          "name": "string.line.lost",
+          "begin": "\\\\",
+          "end": "$"
+        }
+      ]
+    },
+    "stringcontent": {
+      "patterns": [
+        {
+          "name": "constant.character.escape.lost",
+          "match": "\\\\([nrt'\"\\\\]|(x[0-9a-fA-F]{2}))"
+        },
+        {
+          "name": "invalid.illegal.unrecognized-string-escape.lost",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.decimal.lost",
+          "match": "\\b[0-9]+\\b"
+        },
+        {
+          "name": "constant.numeric.binary.lost",
+          "match": "\\b0b[01]+\\b"
+        },
+        {
+          "name": "constant.numeric.octal.lost",
+          "match": "\\b0x[0-7]+\\b"
+        },
+        {
+          "name": "constant.numeric.hexadecimal.lost",
+          "match": "\\b0x[a-fA-F0-9]+\\b"
+        }
+      ]
+    }
+  }
+}

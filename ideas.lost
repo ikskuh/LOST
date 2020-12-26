@@ -1,0 +1,7 @@
+
+
+layout String
+{
+  length: register,
+  ...:    []byte, # the yadda yadda tells that 
+};

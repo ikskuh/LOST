@@ -1,0 +1,135 @@
+#>---------------------------------------------------------<#
+#                 LOST Programming Language                 #
+#>---------------------------------------------------------<#
+
+# Imports another file as a namespace
+import "spu2.lost" as spu2;
+
+# layouts define a sequential memory layout, similar to
+# structs in other languages. layouts can only be accessed
+# via address and cannot be part of variables
+layout VgaLayout 
+{
+  fb_low:      register, # field at offset 0, size "2" (primary register size)
+  fb_high:     register, # field at offset 2
+  stride_low:  register, # field at offset ...
+  stride_high: register,
+  border:      register,
+}
+
+layout UartLayout
+{
+  data: register,
+  status: register,
+}
+
+# enums are scoped integer constants
+enum PageFlag {
+  enabled = 1,
+  write_protected = 2,
+  cached = 4,
+}
+
+# macros are compile time evaluated functions that
+# can be used to compute values or check certain things
+macro PageDescriptor(address: integer, flags: integer) -> integer
+{
+  # Macros can emit compile errors
+  if((address & 0x000FFF) != 0)
+    compileError("address must be page-aligned");
+  if(flag > 0x7)
+    compileError("flag must only be the lower three bit");
+  return (address >> 8) | flags;
+}
+
+# constants are symbols that are not emitted into the final
+# binary when not necessary. they are immutable.
+# `[]T` is a pointer to many elements of `T`
+# `*T` is a pointer to one `T`.
+const MMU: []register = 0x1000;
+const VGA: *VgaLayout = 0x2000;
+const UART: *UartLayout = 0x4000;
+
+# procedures are things that can be called from other procedures
+# the entry point must be determined by an external configuration.
+# "pub" means: visible outside file
+pub proc bios_entrypoint()
+{
+  # cast(T, value) explicitly casts a value into another one
+  # this option might have some runtime cost for expansion/cutting
+  # information
+
+  # Map MMU to 0x1000
+  cast([]register, 0xF000)[1] = PageDescriptor(0x7F0000, PageFlag.enabled);
+
+  MMU[0x2] = PageDescriptor(0x7FD000, PageFlag.enabled); # map VGA ctrl to 0x2000
+  MMU[0x4] = PageDescriptor(0x7F2000, PageFlag.enabled); # Maps UART to 0x4000
+  MMU[0x7] = PageDescriptor(0x810000, PageFlag.enabled); # Map RAM to 0x7000…0x7FFF
+  MMU[0x8] = PageDescriptor(0x800000, PageFlag.enabled); # Map RAM to 0x8000…0xFFFF
+  MMU[0x9] = PageDescriptor(0x801000, PageFlag.enabled);
+  MMU[0xA] = PageDescriptor(0x802000, PageFlag.enabled);
+  MMU[0xB] = PageDescriptor(0x803000, PageFlag.enabled);
+  MMU[0xC] = PageDescriptor(0x804000, PageFlag.enabled);
+  MMU[0xD] = PageDescriptor(0x805000, PageFlag.enabled);
+  MMU[0xE] = PageDescriptor(0x806000, PageFlag.enabled);
+  MMU[0xF] = PageDescriptor(0x807000, PageFlag.enabled); # this will unmap the MMU!
+
+  # Map framebuffer to 0x800000;
+  VGA[0x0] = 0x0000;
+  VGA[0x1] = 0x0080;
+
+  # Setup stack with inline assembler
+  asm(
+    # This is a multiline string literal
+    \\spset 0x8000
+    \\bpset 0x8000
+  );
+
+  # Writes are never discarded, this is used for MMIO
+  # layout fields on a pointer can be accessed via ".fieldName":
+  UART.data = 'H';
+  UART.data = 'e';
+  UART.data = 'l';
+  UART.data = 'l';
+  UART.data = 'o';
+  UART.data = '\r';
+  UART.data = '\n';
+
+  # local variable of type "pointer".
+  # pointer is a unsigned integer with (near) pointer size
+  var address: pointer = 0x8000;
+  loop {
+    # we must cast() the pointer to register, as this might be lossy
+    var color: register = cast(register, address);
+    
+    # create a nice XOR pattern with X and Y.
+    # X is the low byte of the value, Y the high byte
+    color ^= spu2.bswap(address);
+    
+    # pointer values have .byte, .register, … fields to dereference them
+    address.byte = cast(byte, color);
+
+    address += 1;
+    if(address == 0)
+      break;
+  }
+
+  # endless loop structure
+  loop {
+    utils.delay();
+    # reduce the stride by one per loop
+    VGA.stride_low = VGA.stride_low - 1;
+  }
+}
+
+# namespaces group symbols into nice collections
+namespace utils
+{
+  # 100% inline assembly procedures 
+  asmproc delay()
+    \\  push 0x0000
+    \\.wait:
+    \\  add [f:yes] 1
+    \\  [ex:nonzero] jmp .wait
+    \\  ret
+}

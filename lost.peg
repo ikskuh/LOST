@@ -1,0 +1,24 @@
+
+
+
+program := namespace_content;
+
+namespace_content := (import_statement | namespace_decl | layout_decl)*;
+
+namespace_decl := kw_namespace begin_block namespace_content end_block;
+
+import_statement := kw_import string_literal kw_as identifier semicolon;
+
+layout_decl := kw_layout begin_block end_block;
+
+
+# Tokens
+semicolon    := ";";
+colon        := ":";
+
+begin_block  := "{";
+end_block    := "}";
+
+kw_import    := "import";
+kw_layout    := "layout";
+kw_namespace := "namespace";

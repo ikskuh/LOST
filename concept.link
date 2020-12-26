@@ -1,0 +1,28 @@
+# This is a linker description file that 
+# lays out certain stuff in memory, describes the root file
+
+[common]
+cpu = spu-mk-2 # this defines which CPU is compiled for
+
+# this section defines certain memory areas that stuff is linked in.
+# text contains code, rodata constants, data runtime data.
+# Each symbol emitted into a memory area is put into a section. 
+# Sections have ranges of memory spans which the symbols will be stored in.
+[memory map]
+text   = rom
+rodata = rom
+data   = ram
+
+# Sections are declared like this
+[section: rom]
+executable = true   # code can be executed from this section
+writeable  = false  # we cannot write into this section
+range = 0x0000 ... 0x6FFF
+
+[section: ram]
+executable = true
+writeable  = true
+range = 0x8000 ... 0xFFFF
+
+[section: disallow]
+# this is a empty section, you cannot emit symbols here

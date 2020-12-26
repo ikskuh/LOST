@@ -1,0 +1,6 @@
+# This is a project file, defining compiler flags
+# in a file for convenience. Invoke with "lost build"
+
+source      = concept.lost
+entry point = bios_entrypoint
+machine     = concept.link

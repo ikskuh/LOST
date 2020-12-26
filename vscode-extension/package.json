@@ -1,0 +1,38 @@
+{
+    "name": "lost",
+    "displayName": "LOST",
+    "description": "Language support for the LOST programming language",
+    "version": "0.1.0",
+    "publisher": "xq",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/MasterQ32/lost"
+    },
+    "bugs": {
+        "url": "https://github.com/MasterQ32/lost/issues"
+    },
+    "engines": {
+        "vscode": "^1.22.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "lost",
+                "extensions": [
+                    ".lost"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "lost",
+                "scopeName": "source.lost",
+                "path": "./syntaxes/lost.tmLanguage.json"
+            }
+        ]
+    }
+}
